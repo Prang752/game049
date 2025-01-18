@@ -21,10 +21,15 @@ ScreenManager:
 
 
 <ScreenTwo>:
-    BoxLayout:
+    FloatLayout:
         orientation: 'vertical'
         Label:
             text: "Game Start"
             font_size: '90sp'
             color: (1, 1, 1, 1)
-    
+        Button:
+            text: 'Back to Home'
+            size_hint: (None, None)
+            size: (150, 50)
+            pos_hint: {'right': 1, 'top': 1}
+            on_press: root.go_back()

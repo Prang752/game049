@@ -16,7 +16,8 @@ class ScreenOne(Screen):
         self.manager.current = 'screen_two'
 
 class ScreenTwo(Screen):
-    pass
+    def go_back(self):
+         self.manager.current = 'screen_one'
 
 
 class PageoneApp(App) :
