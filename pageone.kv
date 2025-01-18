@@ -1,11 +1,30 @@
-BoxLayout:
-    orientation: 'vertical'
-    
-    Label:
-        text: 'Renya shooting Ryu'
-        size_hint: 1, 3
+ScreenManager:
+    ScreenOne:
+        name: 'screen_one'
+    ScreenTwo:
+        name: 'screen_two'
 
-    Button:
-        text: 'START'
-        size_hint: 1, 1.6
+<ScreenOne>:
+    BoxLayout:
+        orientation: 'vertical'
+        
+        Label:
+            text: 'Renya shooting Ryu'
+            font_size: '80sp'
+            size_hint: 1, 3
+
+        Button:
+            text: 'START'
+            font_size: '65sp'
+            size_hint: 1, 1.6
+            on_press: root.change_screen()
+
+
+<ScreenTwo>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Game Start"
+            font_size: '90sp'
+            color: (1, 1, 1, 1)
     
