@@ -3,6 +3,8 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.lang import Builder
 from kivy.uix.image import Image
 from kivy.clock import Clock
+from kivy.core.window import Window
+
 
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from kivy.resources import resource_add_path
@@ -11,6 +13,13 @@ resource_add_path('D:\\New folder (2)\debug-font')
 LabelBase.register(DEFAULT_FONT, 'DebugF.otf')
 
 class ScreenOne(Screen):
+    def change_button_color(self):
+        self.ids.start_button.background_color = (1, 1, 1, 1)
+        self.ids.start_button.color = (20/255, 158/255, 126/255, 1)
+    
+    def change_label_color(self):
+        self.ids.title_label.color = (20/255, 158/255, 126/255, 1)
+    
     def change_screen(self):
         self.manager.current = 'screen_two'
 

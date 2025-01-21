@@ -6,6 +6,14 @@ ScreenManager:
     ScreenThree:
         name: 'screen_three'
 
+<Label>:
+    color: (20/255, 158/255, 126/255, 1)
+
+<Button>:
+    background_color: (1, 1, 1, 1)
+    color: (20/255, 158/255, 126/255, 1)
+    background_normal: '' 
+
 <ScreenOne>:
     FloatLayout:
         orientation: 'vertical'
@@ -17,18 +25,32 @@ ScreenManager:
             size_hint: 1, 1
             size: self.texture_size
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        
+
+         # Shadow Label
         Label:
             text: 'Renya shooting Ryu'
             font_size: '80sp'
             size_hint: 1, 0.3
+            pos_hint: {'center_x': 0.505, 'center_y': 0.805}
+            color: (0, 0, 0, 0.5) 
+        
+        # Main Label
+        Label:
+            id: title_label
+            text: 'Renya shooting Ryu'
+            font_size: '80sp'
+            size_hint: 1, 0.3
             pos_hint: {'center_x': 0.5, 'center_y': 0.8}
+            color: (20/255, 158/255, 126/255, 1)
+            
 
         Button:
+            id: start_button
             text: 'START'
             font_size: '87sp'
             size_hint: 0.3, 0.15
             pos_hint:{'center_x': 0.5, 'center_y': 0.175}
+            on_press: root.change_button_color
             on_press: root.change_screen()
 
 
