@@ -7,18 +7,28 @@ ScreenManager:
         name: 'screen_three'
 
 <ScreenOne>:
-    BoxLayout:
+    FloatLayout:
         orientation: 'vertical'
+
+        Image:
+            source: 'roreee.jpg'
+            allow_stretch: True
+            keep_ratio: True
+            size_hint: 1, 1
+            size: self.texture_size
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         
         Label:
             text: 'Renya shooting Ryu'
             font_size: '80sp'
-            size_hint: 1, 3
+            size_hint: 1, 0.3
+            pos_hint: {'center_x': 0.5, 'center_y': 0.8}
 
         Button:
             text: 'START'
             font_size: '65sp'
-            size_hint: 1, 1.6
+            size_hint: 0.5, 0.2
+            pos_hint:{'center_x': 0.5, 'center_y': 0.4}
             on_press: root.change_screen()
 
 
