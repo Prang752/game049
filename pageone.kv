@@ -10,9 +10,15 @@ ScreenManager:
     color: (20/255, 158/255, 126/255, 1)
 
 <Button>:
-    background_color: (1, 1, 1, 1)
-    color: (20/255, 158/255, 126/255, 1)
-    background_normal: '' 
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [70]
+    background_color: 0, 0, 0, 0
+    color: (20/255, 158/255, 126/255, 1)  
 
 <ScreenOne>:
     FloatLayout:
