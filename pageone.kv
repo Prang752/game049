@@ -12,13 +12,16 @@ ScreenManager:
 <Button>:
     canvas.before:
         Color:
-            rgba: (1, 1, 1, 1)
+            rgba: (1, 1, 1, 1)  
         RoundedRectangle:
+            source: 'cartridge.jpg'  
             size: self.size
             pos: self.pos
-            radius: [70]
-    background_color: 0, 0, 0, 0
-    color: (20/255, 158/255, 126/255, 1)  
+            radius: [30]  
+            
+    background_color: 0, 0, 0, 0  
+    color: (235/255, 235/255, 235/255, 1)
+
 
 <ScreenOne>:
     FloatLayout:
@@ -35,7 +38,7 @@ ScreenManager:
          # Shadow Label
         Label:
             text: 'Renya shooting Ryu'
-            font_size: '80sp'
+            font_size: '68sp'
             size_hint: 1, 0.3
             pos_hint: {'center_x': 0.505, 'center_y': 0.805}
             color: (0, 0, 0, 0.5) 
@@ -44,20 +47,30 @@ ScreenManager:
         Label:
             id: title_label
             text: 'Renya shooting Ryu'
-            font_size: '80sp'
+            font_size: '68sp'
             size_hint: 1, 0.3
             pos_hint: {'center_x': 0.5, 'center_y': 0.8}
             color: (20/255, 158/255, 126/255, 1)
-            
+        
 
+        # Shadow Label for START Button
+        Label:
+            text: 'START'
+            font_size: '64sp'
+            size_hint: 0.27, 0.1
+            pos_hint: {'center_x': 0.5, 'center_y': 0.175}  # Same position as Button
+            color: (40/255, 39/255, 39/255, 1)  # Pure white color
+              
         Button:
             id: start_button
             text: 'START'
-            font_size: '87sp'
-            size_hint: 0.3, 0.15
+            font_size: '64sp'
+            size_hint: 0.27, 0.1
             pos_hint:{'center_x': 0.5, 'center_y': 0.175}
             on_press: root.change_button_color
             on_press: root.change_screen()
+
+           
 
 
 <ScreenTwo>:
