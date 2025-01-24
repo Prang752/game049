@@ -10,7 +10,7 @@ from kivy.core.text import LabelBase, DEFAULT_FONT
 from kivy.resources import resource_add_path
 
 WINDOW_WIDTH = 564
-WINDOW_HEIGHT = 317
+WINDOW_HEIGHT =317
 Window.size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 Window.resizable = True 
 
@@ -27,7 +27,7 @@ Window.bind(on_resize=enforce_window_size)
 class ScreenOne(Screen):
     def change_button_color(self):
         self.ids.start_button.background_color = (1, 1, 1, 1)
-        self.ids.start_button.color = (20/255, 158/255, 126/255, 1)
+        self.ids.start_button.color = (1, 1, 1, 1)
     
     def change_label_color(self):
         self.ids.title_label.color = (20/255, 158/255, 126/255, 1)
@@ -47,6 +47,36 @@ class ScreenTwo(Screen):
     #   self.manager.current = 'screen_one'
 
 class ScreenThree(Screen):
+
+    def __init__(self, **kwargs):
+        super(ScreenThree, self).__init__(**kwargs)
+        self.ryu_speed = 5  
+        self.ryu1_speed = 5
+        self.ryu_initial_x = Window.width 
+        self.ryu1_initial_x = -200
+
+    def on_enter(self):
+        self.ids.monster_image.pos = (Window.width, 120)
+        self.ids.monster_image_left.pos = (-200, 120)
+
+        Clock.schedule_interval(self.animate_monsters, 0.02)
+
+    def on_leave(self):
+        Clock.unschedule(self.animate_monsters)
+
+    def animate_monsters(self, dt):
+        if self.ids.monster_image.x + self.ids.monster_image.width > 0:
+            self.ids.monster_image.pos = (
+                self.ids.monster_image.x - self.ryu_speed, 
+                self.ids.monster_image.y
+            )
+
+        if self.ids.monster_image_left.x < Window.width:
+            self.ids.monster_image_left.pos = (
+                self.ids.monster_image_left.x + self.ryu1_speed, 
+                self.ids.monster_image_left.y
+            )
+
     def go_back(self):
         self.manager.current = 'screen_one'
 
