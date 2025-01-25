@@ -56,26 +56,49 @@ class ScreenThree(Screen):
         self.ryu1_initial_x = -200
 
     def on_enter(self):
+        self.ids.monster_image.opacity = 0
+        self.ids.monster_image_left.opacity = 0
+
         self.ids.monster_image.pos = (Window.width, 120)
         self.ids.monster_image_left.pos = (-200, 120)
 
-        Clock.schedule_interval(self.animate_monsters, 0.02)
+        # Clock.schedule_interval(self.animate_monsters, 0.02)
+        Clock.schedule_once(self.start_monster_right, 2)
+        Clock.schedule_once(self.start_monster_left, 4)
 
     def on_leave(self):
-        Clock.unschedule(self.animate_monsters)
+        Clock.unschedule(self.start_monster_right)
+        Clock.unschedule(self.start_monster_left)
+        Clock.unschedule(self.animate_monster_right)
+        Clock.unschedule(self.animate_monster_left)
 
-    def animate_monsters(self, dt):
+    def start_monster_right(self, *args):
+        # เริ่ม ฝั่งขวา
+        self.ids.monster_image.opacity = 1
+        Clock.schedule_interval(self.animate_monster_right, 0.02)
+
+    def start_monster_left(self, *args):
+        # เริ่ม ฝั่งซ้าย
+        self.ids.monster_image_left.opacity = 1
+        Clock.schedule_interval(self.animate_monster_left, 0.02)
+
+    
+    def animate_monster_right(self, dt):
+        # monster ฝั่งขวา (เลื่อนซ้าย)
         if self.ids.monster_image.x + self.ids.monster_image.width > 0:
             self.ids.monster_image.pos = (
-                self.ids.monster_image.x - self.ryu_speed, 
+                self.ids.monster_image.x - self.ryu_speed,
                 self.ids.monster_image.y
             )
 
+    def animate_monster_left(self, dt):
+        # monster ฝั่งซ้าย (เลื่อนขวา)
         if self.ids.monster_image_left.x < Window.width:
             self.ids.monster_image_left.pos = (
-                self.ids.monster_image_left.x + self.ryu1_speed, 
+                self.ids.monster_image_left.x + self.ryu1_speed,
                 self.ids.monster_image_left.y
             )
+
 
     def go_back(self):
         self.manager.current = 'screen_one'
