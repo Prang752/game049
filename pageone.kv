@@ -89,6 +89,10 @@ ScreenManager:
     size_hint: (0.6, 0.6)
 
 <ScreenThree>:
+    hero_image: hero_image
+    monster_image: monster_image
+    monster_image_left: monster_image_left
+
     FloatLayout:
         orientation: 'vertical'
 
@@ -125,11 +129,12 @@ ScreenManager:
             source: 'Ryu_1.png' 
             pos: (-200, 120)
             opacity: 0
-        
-        Button:
-            text: 'Back to Home'
-            size_hint: (None, None)
-            size: (150, 50)
-            pos_hint: {'right': 1, 'top': 1}
-            on_press: root.go_back()
+       
+        Label:
+            id: game_over_label
+            text: "GAME OVER"
+            font_size: "90sp"
+            color: (1, 0, 0, 1)
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            opacity: 0  # ซ่อน Label 
 
