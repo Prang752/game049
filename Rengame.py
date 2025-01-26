@@ -7,6 +7,8 @@ from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from kivy.resources import resource_add_path
+from random import randint
+from kivy.uix.popup import Popup
 
 WINDOW_WIDTH = 564
 WINDOW_HEIGHT =317
@@ -15,7 +17,6 @@ Window.size = (WINDOW_WIDTH, WINDOW_HEIGHT)
 
 resource_add_path('D:\\New folder (2)\debug-font')
 LabelBase.register(DEFAULT_FONT, 'DebugF.otf')
-
 
 class ScreenOne(Screen):
     def change_button_color(self):
@@ -50,20 +51,41 @@ class ScreenThree(Screen):
         self.hero_facing_right = True
         self.monster_active = False  
         self.hero_shooting = False
+        self.hero_image = None  # กำหนดค่าเริ่มต้นของ hero_image
+        # self.attack_effect_right = None  # กำหนดค่าเริ่มต้นของ effect_image
+        # self.attack_effect_left = None
+        self.score = 0  # คะแนนเริ่มต้น
+        self.monster_active = True
+
 
        
         Window.bind(on_key_down=self.on_key_down)
+        Window.bind(on_key_up=self.on_key_up)
+
+    def on_parent(self, instance, parent):
+        # เมื่อวิวถูกเพิ่มไปยัง parent (Kivy เรียกใช้ในเวลานี้)
+        if parent:
+            self.hero_image = self.ids.hero_image  # เข้าถึง hero_image ที่นี่
+            self.hero_attack_image_right = self.hero_attack_image_right
+            self.hero_attack_image_left = self.hero_attack_image_left
+            self.attack_effect_right = self.ids.attack_effect_right  # เข้าถึง effect_image ที่นี่
+            self.attack_effect_left = self.ids.attack_effect_left 
+            
 
     def on_enter(self):
-        self.ids.monster_image.opacity = 0
+        self.ids.monster_image_right.opacity = 0
         self.ids.monster_image_left.opacity = 0
 
-        self.ids.monster_image.pos = (Window.width + 100, 120)
+        self.ids.monster_image_right.pos = (Window.width + 100, 120)
         self.ids.monster_image_left.pos = (-200, 120)
 
-        # Clock.schedule_interval(self.animate_monsters, 0.02)
-        Clock.schedule_once(self.start_monster_right, 2)
-        Clock.schedule_once(self.start_monster_left, 4)
+        self.ids.score_label.text = f"RYU{self.score}"  # อัปเดตคะแนน
+        self.ids.monster_image_right.opacity = 1
+        self.ids.monster_image_left.opacity = 1
+
+        # เริ่มเคลื่อนที่มอนสเตอร์
+        Clock.schedule_interval(self.animate_monster_right, 0.02)
+        Clock.schedule_interval(self.animate_monster_left, 0.02)
         
         self.monster_active = True
 
@@ -79,14 +101,18 @@ class ScreenThree(Screen):
         print(f"Key pressed: {key}")  # ตรวจสอบการกดปุ่ม
         if key == 275:  # ลูกศรขวา
             print("Right arrow key pressed!")
-            self.hero_shoot("right")
+            self.hero_shoot("right")  # เรียกฟังก์ชัน hero_shoot("right")
         elif key == 276:  # ลูกศรซ้าย
             print("Left arrow key pressed!")
-            self.hero_shoot("left")
+            self.hero_shoot("left")  # เรียกฟังก์ชัน hero_shoot("left")
+
+    def on_key_up(self, window, key, scancode):
+        print(f"Key released: {key}")  # ตรวจสอบเมื่อปล่อยปุ่ม
+        self.reset_hero_image()
 
     def start_monster_right(self, *args):
         # เริ่ม ฝั่งขวา
-        self.ids.monster_image.opacity = 1
+        self.ids.monster_image_right.opacity = 1
         Clock.schedule_interval(self.animate_monster_right, 0.02)
 
     def start_monster_left(self, *args):
@@ -94,66 +120,99 @@ class ScreenThree(Screen):
         self.ids.monster_image_left.opacity = 1
         Clock.schedule_interval(self.animate_monster_left, 0.02)
 
+    def update_monsters(self, dt):
+        for monster in [self.ids.monster_image_left, self.ids.monster_image_right]:
+            monster.x += 5 if "right" in monster.id else -5
+            if monster.x < -monster.width or monster.x > Window.width:
+                self.reset_monster(monster)
+            self.check_collision()
+
     def animate_monster_right(self, dt):
-        if self.ids.monster_image.x + self.ids.monster_image.width > 0:
-            self.ids.monster_image.x -= self.ryu_speed
-            if self.ids.monster_image.opacity == 1 and self.check_collision(self.ids.hero_image, self.ids.monster_image):
+        if self.ids.monster_image_right.opacity == 1:
+            self.ids.monster_image_right.x -= self.ryu_speed
+            if self.check_collision(self.ids.hero_image, self.ids.monster_image_right):
                 self.game_over()
+            if self.ids.monster_image_right.x < -200:
+                self.reset_monster(self.ids.monster_image_right)
+
+    
+            if self.check_collision(self.ids.hero_image, self.ids.monster_image_right):
+                print("Collision detected!")
+                self.game_over()  # ฟังก์ชันที่ใช้แสดงว่าเกมจบ
 
     def animate_monster_left(self, dt):
-        if self.ids.monster_image_left.x < Window.width:
+        if self.ids.monster_image_left.opacity == 1:
             self.ids.monster_image_left.x += self.ryu1_speed
-            if self.ids.monster_image_left.opacity == 1 and self.check_collision(self.ids.hero_image, self.ids.monster_image_left):
+            if self.check_collision(self.ids.hero_image, self.ids.monster_image_left):
                 self.game_over()
+            if self.ids.monster_image_left.x > Window.width + 200:
+                self.reset_monster(self.ids.monster_image_left)
+
+            if not self.game_over_flag:  # ตรวจสอบสถานะก่อนเรียก game_over
+                if self.check_collision(self.ids.hero_image, self.ids.monster_image_left):
+                    self.game_over()
+
+    def reset_monster(self, monster):
+            monster_name = "right" if monster is self.ids.monster_image_right else "left"
+            monster.x = Window.width + randint(100, 300) if monster_name == "right" else -randint(100, 300)
 
     def hero_shoot(self, direction):
-        if not self.hero_shooting:  # ตรวจสอบว่าไม่กำลังยิงอยู่
-            self.hero_shooting = True  # ตั้งค่า flag ว่ากำลังยิง
-            if direction == "right":
-                self.ids.hero_image.source = "fight_R.png"
-                if self.check_collision(self.ids.hero_image, self.ids.monster_image):
-                    self.ids.monster_image.opacity = 0
-                    Clock.unschedule(self.animate_monster_right)
+        if direction == "right":
+            self.ids.hero_attack_image_right.opacity = 1  # แสดงภาพโจมตีขวา
+            Clock.schedule_once(self.check_hit_right, 0.1)
+            self.ids.hero_attack_image_left.opacity = 0  # ซ่อนภาพโจมตีซ้าย
+            self.ids.hero_image.source = "fight_R.png"  # เปลี่ยนภาพตัวละครเป็นภาพโจมตี
+            self.ids.hero_image.opacity = 0  # ซ่อนภาพตัวละครเมื่อโจมตี
+            self.ids.attack_effect_right.source = "effect_R.png"  # เปลี่ยนเอฟเฟกต์ขวา
+            self.ids.attack_effect_right.opacity = 1  # แสดงเอฟเฟกต์การโจมตี
+        elif direction == "left":
+            self.ids.hero_attack_image_left.opacity = 1  # แสดงภาพโจมตีซ้าย
+            Clock.schedule_once(self.check_hit_left, 0.1)
+            self.ids.hero_attack_image_right.opacity = 0  # ซ่อนภาพโจมตีขวา
+            self.ids.hero_image.source = "fight_L.png"  # เปลี่ยนภาพตัวละครเป็นภาพโจมตี
+            self.ids.hero_image.opacity = 0  # ซ่อนภาพตัวละครเมื่อโจมตี
+            self.ids.attack_effect_left.source = "effect_L.png"  # เปลี่ยนเอฟเฟกต์ซ้าย
+            self.ids.attack_effect_left.opacity = 1  # แสดงเอฟเฟกต์การโจมตี
 
-            elif direction == "left":
-                self.ids.hero_image.source = "fight_L.png"
-                if self.check_collision(self.ids.hero_image, self.ids.monster_image_left):
-                    self.ids.monster_image_left.opacity = 0
-                    Clock.unschedule(self.animate_monster_left)
+    def check_hit_right(self, *args):
+        if self.check_collision(self.ids.attack_effect_right, self.ids.monster_image_right):
+            self.score += 1
+            self.ids.score_label.text = f"RYU {self.score}"
+            self.reset_monster(self.ids.monster_image_right)
+        self.ids.attack_effect_right.opacity = 0
 
-           
-            Clock.schedule_once(self.reset_hero_image, 0.2)  # เปลี่ยนภาพ
+    def check_hit_left(self, *args):
+        if self.check_collision(self.ids.attack_effect_left, self.ids.monster_image_left):
+            self.score += 1
+            self.ids.score_label.text = f"RYU {self.score}"
+            self.reset_monster(self.ids.monster_image_left)
+        self.ids.attack_effect_left.opacity = 0
 
-
-
-    def reset_hero_image(self, *args):
-        # self.ids.hero_image.canvas.clear()  # ล้าง canvas ก่อนเปลี่ยนภาพ
-        self.ids.hero_image.source = "lauren.png"
+    def reset_hero_image(self):
+        self.ids.hero_image.canvas.clear()
+        self.ids.hero_image.source = "lauren.png"  # เปลี่ยนภาพกลับเป็นภาพเริ่มต้น
+        self.ids.hero_image.opacity = 1  # แสดงภาพเริ่มต้น
+        self.ids.hero_attack_image_right.opacity = 0  # ซ่อนภาพโจมตีขวา
+        self.ids.hero_attack_image_left.opacity = 0  # ซ่อนภาพโจมตีซ้าย
+        self.ids.attack_effect_right.opacity = 0  # ซ่อนเอฟเฟกต์ขวา
+        self.ids.attack_effect_left.opacity = 0  # ซ่อนเอฟเฟกต์ซ้าย
         print("Image reset to lauren.png")  # ตรวจสอบว่าเปลี่ยนหรือยัง
-        self.hero_shooting = False 
-    
+        self.hero_shooting = False
+        
     def check_collision(self, widget1, widget2):
-        w1_x, w1_y = widget1.pos
-        w1_width, w1_height = widget1.size
-        w2_x, w2_y = widget2.pos
-        w2_width, w2_height = widget2.size
+        print(f"Hero: {widget1.pos}, Monster: {widget2.pos}")
+        if widget1.collide_widget(widget2):
+            print("Collision detected!")
+            return True
+        return False
 
-        return not (
-            w1_x + w1_width < w2_x or
-            w1_x > w2_x + w2_width or
-            w1_y + w1_height < w2_y or
-            w1_y > w2_y + w2_height
-        )
-
+    game_over_flag = False
     def game_over(self):
-        # หยุดการทำงานของ Clock
-        Clock.unschedule(self.animate_monster_right)
-        Clock.unschedule(self.animate_monster_left)
-
-        self.monster_active = False  # ปิดสถานะการเคลื่อนไหวของมอนสเตอร์
-        self.ids.game_over_label.opacity = 1
-        Clock.schedule_once(self.return_to_home, 2)
-
+        if not self.game_over_flag:  # เรียก game_over ได้เพียงครั้งเดียว
+            self.game_over_flag = True
+            print("Game Over!")
+            self.manager.current = "game_over_screen"
+        
     def return_to_home(self, *args):
         self.manager.current = 'screen_one'
 

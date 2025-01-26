@@ -5,6 +5,15 @@ ScreenManager:
         name: 'screen_two'
     ScreenThree:
         name: 'screen_three'
+    Screen:
+        name: "game_over_screen"
+        BoxLayout:
+            orientation: "vertical"
+            Label:
+                text: "Game Over!"
+            Button:
+                text: "Back to Main Menu"
+                on_release: app.root.current = "screen_one"
 
 <Label>:
     color: (20/255, 158/255, 126/255, 1)
@@ -90,14 +99,19 @@ ScreenManager:
 
 <ScreenThree>:
     hero_image: hero_image
-    monster_image: monster_image
+    hero_attack_image_right: hero_attack_image_right
+    hero_attack_image_left: hero_attack_image_left
+    monster_image_right: monster_image_right
     monster_image_left: monster_image_left
+    attack_effect_right: attack_effect_right
+    attack_effect_left: attack_effect_left
 
     FloatLayout:
         orientation: 'vertical'
 
         Label:
-            text: "RYU "
+            id: score_label
+            
             font_size: '37sp'
             color: (1, 1, 1, 1)
             size_hint: (None, None)
@@ -105,7 +119,7 @@ ScreenManager:
             pos: 10, self.parent.height - 50
         
         Label:
-            text: "CAT "
+            text: "LIFE "
             font_size: '37sp'
             color: (1, 1, 1, 1)
             size_hint: (None, None)
@@ -115,20 +129,54 @@ ScreenManager:
         Image:
             id: hero_image
             source: 'lauren.png' 
-            size_hint: (0.6, 0.6)
+            size_hint: (0.5, 0.5)
             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
 
+        
         Image:
-            id: monster_image
+            id: hero_attack_image_right
+            source: 'fight_R.png' 
+            size_hint: (0.5, 0.5)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+            opacity: 0
+
+        Image:
+            id: hero_attack_image_left
+            source: 'fight_L.png' 
+            size_hint: (0.5, 0.5)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+            opacity: 0
+
+
+        Image:
+            id: monster_image_right
             source: 'Ryu.png' 
-            pos: (0, 120)
+            size_hint: (0.4, 0.4)
+            pos: (0, 150)
             opacity: 0
 
         Image:
             id: monster_image_left
             source: 'Ryu_1.png' 
-            pos: (-200, 120)
+            size_hint: (0.4, 0.4)
+            pos: (-200, 150)
             opacity: 0
+
+        # เอฟเฟกต์การโจมตีขวา
+        Image:
+            id: attack_effect_right
+            source: 'effect_R.png'  # เปลี่ยนเป็นภาพเอฟเฟกต์ขวา
+            size_hint: (0.3, 0.3)
+            pos_hint: {'center_x': 0.7, 'center_y': 0.55}
+            opacity: 0  # ซ่อนเอฟเฟกต์เริ่มต้น
+
+        # เอฟเฟกต์การโจมตีซ้าย
+        Image:
+            id: attack_effect_left
+            source: 'effect_L.png'  # เปลี่ยนเป็นภาพเอฟเฟกต์ซ้าย
+            size_hint: (0.3, 0.3)
+            pos_hint: {'center_x': 0.3, 'center_y': 0.55}
+            opacity: 0  # ซ่อนเอฟเฟกต์เริ่มต้น
        
         Label:
             id: game_over_label
@@ -138,3 +186,11 @@ ScreenManager:
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             opacity: 0  # ซ่อน Label 
 
+    
+
+        Button:
+            text: 'Back to Home' #ย้อนกลับหน้าแรก
+            size_hint: (None, None)
+            size: (150, 50)
+            pos_hint: {'right': 1, 'top': 1}
+            on_press: root.go_back()
