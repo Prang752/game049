@@ -101,6 +101,7 @@ ScreenManager:
     size_hint: (0.6, 0.6)
 
 <ScreenThree>:
+    hero_life: 3 
     hero_image: hero_image
     hero_attack_image_right: hero_attack_image_right
     hero_attack_image_left: hero_attack_image_left
@@ -128,17 +129,18 @@ ScreenManager:
             font_size: '37sp'
             color: (1, 1, 1, 1)
             size_hint: (None, None)
-            size: (100, 40)
+            size: (126, 40)
             pos: 10, self.parent.height - 50
 
         
         Label:
-            text: "LIFE "
+            id: life_label
+            text: "LIFE 3"
             font_size: '37sp'
             color: (1, 1, 1, 1)
-            size_hint: (None, None)
-            size: (100, 40)
-            pos: 10, self.parent.height - 100
+            size_hint: None, None
+            size: 100, 40
+            pos: 10, root.height - 100
 
         Image:
             id: hero_image
@@ -164,14 +166,14 @@ ScreenManager:
         Image:
             id: monster_image_right
             source: 'Ryu.png' 
-            size_hint: (0.4, 0.4)
+            size_hint: (0.4, 0.6)
             pos: (250, 150)
             opacity: 0
 
         Image:
             id: monster_image_left
             source: 'Ryu_1.png' 
-            size_hint: (0.4, 0.4)
+            size_hint: (0.4, 0.6)
             pos: (-200, 150)
             opacity: 0
 
@@ -199,6 +201,12 @@ ScreenManager:
             size: (150, 50)
             pos_hint: {'right': 1, 'top': 1}
             on_press: root.go_back()
+
+        Image:
+            id: hero_image
+            source: 'lauren.png' 
+            size_hint: (0.2, 0.2)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.2}
 
 <GameOverScreen>:
     BoxLayout:

@@ -10,6 +10,9 @@ from kivy.resources import resource_add_path
 from random import randint
 from kivy.core.audio import SoundLoader
 
+
+
+
 resource_add_path('D:\\New folder (2)\debug-font')
 LabelBase.register(DEFAULT_FONT, 'DebugF.otf')
 
@@ -50,6 +53,7 @@ class ScreenTwo(Screen):
 
 
 class ScreenThree(Screen):
+    hero_life = 3
 
     def __init__(self, **kwargs):
         super(ScreenThree, self).__init__(**kwargs)
@@ -73,6 +77,23 @@ class ScreenThree(Screen):
         Window.bind(on_key_down=self.on_key_down)
         Window.bind(on_key_up=self.on_key_up)
 
+    def on_touch_move(self, touch):
+        if self.hero_life > 0:
+            # Logic for hero movement goes here
+            pass
+
+    def update(self, dt):
+        # เพิ่มการตรวจจับการชน (collision) กับมอนสเตอร์
+        if self.hero.collide_widget(self.monster):
+            self.hero_life -= 1
+            if self.hero_life <= 0:
+                self.game_over()
+
+        # อัปเดตแสดงชีวิตบนหน้าจอ
+        self.ids['life_label'].text = f"LIFE {self.hero_life}"
+
+
+
     def on_parent(self, instance, parent):
         # เมื่อวิวถูกเพิ่มไปยัง parent (Kivy เรียกใช้ในเวลานี้)
         if parent:
@@ -84,6 +105,12 @@ class ScreenThree(Screen):
             
 
     def on_enter(self):
+        
+    
+        # Ensure the label exists before accessing it
+        if hasattr(self.ids, 'life_label'):
+            self.ids.life_label.text = f"LIFE {self.hero_life}"
+
         self.ids.monster_image_right.opacity = 0
         self.ids.monster_image_left.opacity = 0
 
@@ -93,10 +120,11 @@ class ScreenThree(Screen):
         self.ids.score_label.text = f"RYU{self.score}"  # อัปเดตคะแนน
         self.ids.monster_image_right.opacity = 1
         self.ids.monster_image_left.opacity = 1
+        
 
         # เริ่มเคลื่อนที่มอนสเตอร์
-        Clock.schedule_interval(self.animate_monster_right, 0.1)
-        Clock.schedule_interval(self.animate_monster_left, 0.1)
+        Clock.schedule_interval(self.animate_monster_right, 0.03)
+        Clock.schedule_interval(self.animate_monster_left, 0.03)
         
         self.monster_active = True
 
@@ -132,12 +160,12 @@ class ScreenThree(Screen):
     def start_monster_right(self, *args):
         # เริ่ม ฝั่งขวา
         self.ids.monster_image_right.opacity = 1
-        Clock.schedule_interval(self.animate_monster_right, 0.03)
+        Clock.schedule_interval(self.animate_monster_right, 0.02)
 
     def start_monster_left(self, *args):
         # เริ่ม ฝั่งซ้าย
         self.ids.monster_image_left.opacity = 1
-        Clock.schedule_interval(self.animate_monster_left, 0.03)
+        Clock.schedule_interval(self.animate_monster_left, 0.02)
 
     def update_monsters(self, dt):
         for monster in [self.ids.monster_image_left, self.ids.monster_image_right]:
@@ -254,25 +282,32 @@ class ScreenThree(Screen):
         return False
 
     
-    game_over_flag = False
+    # game_over_flag = False
+    # def game_over(self):
+    #     if not self.game_over_flag:  # เรียก game_over ได้เพียงครั้งเดียว
+    #         self.game_over_flag = True
+    #         print("Game Over!")
+    #         self.manager.get_screen('game_over_screen').ids.game_over_label.opacity = 1
+    #         self.manager.get_screen('game_over_screen').ids.score_label.text = f"RYU Score  {self.score}"
+    #         self.manager.current = "game_over_screen"  # เปลี่ยนไปหน้า game over
+    
     def game_over(self):
-        if not self.game_over_flag:  # เรียก game_over ได้เพียงครั้งเดียว
+        if not self.game_over_flag:  # Ensure that game over logic is triggered only once
             self.game_over_flag = True
             print("Game Over!")
+            self.ids.life_label.text = "LIFE 0"  # Update life label for the game over condition
             self.manager.get_screen('game_over_screen').ids.game_over_label.opacity = 1
-            self.manager.get_screen('game_over_screen').ids.score_label.text = f"RYU Score  {self.score}"
-            self.manager.current = "game_over_screen"  # เปลี่ยนไปหน้า game over
-    
-    # def game_over(self):
-    #     if self.monster_active and not self.game_over_flag:  # ตรวจสอบสถานะเกมก่อน
-    #         self.game_over_flag = True
-    #         self.monster_active = False  # หยุดการทำงานของมอนสเตอร์
-    #         Clock.unschedule(self.animate_monster_right)  # หยุดการเคลื่อนที่ของมอนสเตอร์
-    #         Clock.unschedule(self.animate_monster_left)
-            
-        
-    #         self.manager.get_screen('game_over_screen').ids.score_label.text = f"RYU Score {self.score}"
-    #         self.manager.current = "game_over_screen"
+            self.manager.get_screen('game_over_screen').ids.score_label.text = f"RYU Score {self.score}"
+            self.manager.current = "game_over_screen"  # Switch to game over screen
+
+    def reset_game_state(self):
+        self.hero_life = 3  # Reset life count
+        self.score = 0  # Reset score
+        self.game_over_flag = False  # Reset game-over flag
+        # Reset other necessary values like monster positions
+        self.reset_monster(self.ids.monster_image_right)
+        self.reset_monster(self.ids.monster_image_left)
+        self.ids.life_label.text = f"LIFE {self.hero_life}"  # Update life label to the starting value
 
 
     def return_to_home(self, *args):
@@ -282,8 +317,6 @@ class ScreenThree(Screen):
         self.manager.current = 'screen_one'
     
     
-
-
 
 class GameOverScreen(Screen):
     def restart_game(self):
