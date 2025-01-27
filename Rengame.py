@@ -8,12 +8,13 @@ from kivy.uix.label import Label
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from kivy.resources import resource_add_path
 from random import randint
-from kivy.uix.popup import Popup
+from kivy.uix.screenmanager import Screen
+
 
 WINDOW_WIDTH = 564
 WINDOW_HEIGHT =317
 Window.size = (WINDOW_WIDTH, WINDOW_HEIGHT)
-# Window.resizable = True 
+Window.resizable = True 
 
 resource_add_path('D:\\New folder (2)\debug-font')
 LabelBase.register(DEFAULT_FONT, 'DebugF.otf')
@@ -43,6 +44,7 @@ class ScreenThree(Screen):
 
     def __init__(self, **kwargs):
         super(ScreenThree, self).__init__(**kwargs)
+        self.game_over_flag = False
         self.ryu_speed = 5  
         self.ryu1_speed = 5
         self.ryu_initial_x = Window.width 
@@ -84,8 +86,8 @@ class ScreenThree(Screen):
         self.ids.monster_image_left.opacity = 1
 
         # เริ่มเคลื่อนที่มอนสเตอร์
-        Clock.schedule_interval(self.animate_monster_right, 0.02)
-        Clock.schedule_interval(self.animate_monster_left, 0.02)
+        Clock.schedule_interval(self.animate_monster_right, 0.1)
+        Clock.schedule_interval(self.animate_monster_left, 0.1)
         
         self.monster_active = True
 
@@ -93,8 +95,13 @@ class ScreenThree(Screen):
 
 
     def on_leave(self):
+        self.ids.monster_image_right.opacity = 0
+        self.ids.monster_image_left.opacity = 0
         Clock.unschedule(self.animate_monster_right)
         Clock.unschedule(self.animate_monster_left)
+        self.reset_monster(self.ids.monster_image_right)
+        self.reset_monster(self.ids.monster_image_left)
+
         Window.unbind(on_key_down=self.on_key_down)
         
     def on_key_down(self, window, key, scancode, codepoint, modifier):
@@ -102,23 +109,26 @@ class ScreenThree(Screen):
         if key == 275:  # ลูกศรขวา
             print("Right arrow key pressed!")
             self.hero_shoot("right")  # เรียกฟังก์ชัน hero_shoot("right")
+            self.ids.hero_image.opacity = 0
         elif key == 276:  # ลูกศรซ้าย
             print("Left arrow key pressed!")
             self.hero_shoot("left")  # เรียกฟังก์ชัน hero_shoot("left")
+            self.ids.hero_image.opacity = 0
 
     def on_key_up(self, window, key, scancode):
         print(f"Key released: {key}")  # ตรวจสอบเมื่อปล่อยปุ่ม
         self.reset_hero_image()
+       
 
     def start_monster_right(self, *args):
         # เริ่ม ฝั่งขวา
         self.ids.monster_image_right.opacity = 1
-        Clock.schedule_interval(self.animate_monster_right, 0.02)
+        Clock.schedule_interval(self.animate_monster_right, 0.03)
 
     def start_monster_left(self, *args):
         # เริ่ม ฝั่งซ้าย
         self.ids.monster_image_left.opacity = 1
-        Clock.schedule_interval(self.animate_monster_left, 0.02)
+        Clock.schedule_interval(self.animate_monster_left, 0.03)
 
     def update_monsters(self, dt):
         for monster in [self.ids.monster_image_left, self.ids.monster_image_right]:
@@ -130,27 +140,55 @@ class ScreenThree(Screen):
     def animate_monster_right(self, dt):
         if self.ids.monster_image_right.opacity == 1:
             self.ids.monster_image_right.x -= self.ryu_speed
-            if self.check_collision(self.ids.hero_image, self.ids.monster_image_right):
-                self.game_over()
+        
+            monster_pos = self.ids.monster_image_right.x
+            hero_pos = self.ids.hero_image.x
+            distance = abs(monster_pos - hero_pos)
+
+            if distance < 100:  # ปรับระยะนี้ตามที่ต้องการ เช่น < 100
+                if self.check_collision(self.ids.hero_image, self.ids.monster_image_right):
+                    self.game_over()
+
+            
+
+
+            if self.ids.monster_image_right.x < self.ids.hero_image.x + 200:  
+                if self.check_collision(self.ids.hero_image, self.ids.monster_image_right):
+                    self.game_over() 
+
             if self.ids.monster_image_right.x < -200:
                 self.reset_monster(self.ids.monster_image_right)
 
-    
+
             if self.check_collision(self.ids.hero_image, self.ids.monster_image_right):
                 print("Collision detected!")
-                self.game_over()  # ฟังก์ชันที่ใช้แสดงว่าเกมจบ
+                self.game_over()  
+
+   
 
     def animate_monster_left(self, dt):
         if self.ids.monster_image_left.opacity == 1:
             self.ids.monster_image_left.x += self.ryu1_speed
+
+            monster_pos = self.ids.monster_image_left.x
+            hero_pos = self.ids.hero_image.x
+            distance = abs(monster_pos - hero_pos)
+            
+            # ตรวจจับการชนเมื่อมอนสเตอร์เข้าใกล้มากขึ้น 
+            if distance < 100:  # ปรับระยะนี้ตามที่ต้องการ เช่น < 100
+                if self.check_collision(self.ids.hero_image, self.ids.monster_image_left):
+                    self.game_over()
+
             if self.check_collision(self.ids.hero_image, self.ids.monster_image_left):
                 self.game_over()
+
+            if self.ids.monster_image_left.x > self.ids.hero_image.x - 50:  
+                if self.check_collision(self.ids.hero_image, self.ids.monster_image_left):
+                    self.game_over()  
+
             if self.ids.monster_image_left.x > Window.width + 200:
                 self.reset_monster(self.ids.monster_image_left)
 
-            if not self.game_over_flag:  # ตรวจสอบสถานะก่อนเรียก game_over
-                if self.check_collision(self.ids.hero_image, self.ids.monster_image_left):
-                    self.game_over()
 
     def reset_monster(self, monster):
             monster_name = "right" if monster is self.ids.monster_image_right else "left"
@@ -184,7 +222,7 @@ class ScreenThree(Screen):
     def check_hit_left(self, *args):
         if self.check_collision(self.ids.attack_effect_left, self.ids.monster_image_left):
             self.score += 1
-            self.ids.score_label.text = f"RYU {self.score}"
+            self.ids.score_label.text = f"RYU  {self.score}"
             self.reset_monster(self.ids.monster_image_left)
         self.ids.attack_effect_left.opacity = 0
 
@@ -200,29 +238,63 @@ class ScreenThree(Screen):
         self.hero_shooting = False
         
     def check_collision(self, widget1, widget2):
-        print(f"Hero: {widget1.pos}, Monster: {widget2.pos}")
+        # print(f"Hero: {widget1.pos}, Monster: {widget2.pos}")
         if widget1.collide_widget(widget2):
-            print("Collision detected!")
+            # print("Collision detected!")
             return True
         return False
 
+    
     game_over_flag = False
     def game_over(self):
         if not self.game_over_flag:  # เรียก game_over ได้เพียงครั้งเดียว
             self.game_over_flag = True
             print("Game Over!")
-            self.manager.current = "game_over_screen"
+            self.manager.get_screen('game_over_screen').ids.game_over_label.opacity = 1
+            self.manager.get_screen('game_over_screen').ids.score_label.text = f"RYU Score  {self.score}"
+            self.manager.current = "game_over_screen"  # เปลี่ยนไปหน้า game over
+    
+    # def game_over(self):
+    #     if self.monster_active and not self.game_over_flag:  # ตรวจสอบสถานะเกมก่อน
+    #         self.game_over_flag = True
+    #         self.monster_active = False  # หยุดการทำงานของมอนสเตอร์
+    #         Clock.unschedule(self.animate_monster_right)  # หยุดการเคลื่อนที่ของมอนสเตอร์
+    #         Clock.unschedule(self.animate_monster_left)
+            
         
+    #         self.manager.get_screen('game_over_screen').ids.score_label.text = f"RYU Score {self.score}"
+    #         self.manager.current = "game_over_screen"
+
+
     def return_to_home(self, *args):
         self.manager.current = 'screen_one'
 
     def go_back(self):
         self.manager.current = 'screen_one'
+    
+    
 
+
+
+class GameOverScreen(Screen):
+    def restart_game(self):
+        """ฟังก์ชันสำหรับเริ่มเกมใหม่"""
+        self.manager.get_screen('screen_three').reset_game_state()
+        self.manager.current = 'screen_three'
 
 class PageoneApp(App) :
     def build(self):
         return Builder.load_file('pageone.kv')
+
+    def reset_game(self):
+        """รีเซ็ตเกมเมื่อกลับไปหน้าแรก"""
+        screen_three = self.root.get_screen("screen_three")
+        screen_three.game_over_flag = False
+        screen_three.score = 0
+        screen_three.reset_monster(screen_three.ids.monster_image_left)
+        screen_three.reset_monster(screen_three.ids.monster_image_right)
+
+        
 
 if __name__ =='__main__':
     PageoneApp().run()

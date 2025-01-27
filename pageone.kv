@@ -5,15 +5,8 @@ ScreenManager:
         name: 'screen_two'
     ScreenThree:
         name: 'screen_three'
-    Screen:
+    GameOverScreen:
         name: "game_over_screen"
-        BoxLayout:
-            orientation: "vertical"
-            Label:
-                text: "Game Over!"
-            Button:
-                text: "Back to Main Menu"
-                on_release: app.root.current = "screen_one"
 
 <Label>:
     color: (20/255, 158/255, 126/255, 1)
@@ -131,7 +124,6 @@ ScreenManager:
             source: 'lauren.png' 
             size_hint: (0.5, 0.5)
             pos_hint: {'center_x': 0.5, 'center_y': 0.3}
-
         
         Image:
             id: hero_attack_image_right
@@ -152,7 +144,7 @@ ScreenManager:
             id: monster_image_right
             source: 'Ryu.png' 
             size_hint: (0.4, 0.4)
-            pos: (0, 150)
+            pos: (250, 150)
             opacity: 0
 
         Image:
@@ -177,16 +169,8 @@ ScreenManager:
             size_hint: (0.3, 0.3)
             pos_hint: {'center_x': 0.3, 'center_y': 0.55}
             opacity: 0  # ซ่อนเอฟเฟกต์เริ่มต้น
-       
-        Label:
-            id: game_over_label
-            text: "GAME OVER"
-            font_size: "90sp"
-            color: (1, 0, 0, 1)
-            pos_hint: {"center_x": 0.5, "center_y": 0.5}
-            opacity: 0  # ซ่อน Label 
-
     
+
 
         Button:
             text: 'Back to Home' #ย้อนกลับหน้าแรก
@@ -194,3 +178,40 @@ ScreenManager:
             size: (150, 50)
             pos_hint: {'right': 1, 'top': 1}
             on_press: root.go_back()
+
+<GameOverScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        spacing: dp(10)
+        padding: dp(20)
+        
+        
+        Label:
+            id: game_over_label
+            text: "GAME OVER !"
+            font_size: "90sp"
+            color: (1, 0, 0, 1)
+            pos_hint: {"center_x": 0.5, "center_y": 0.7}
+            opacity: 1 
+
+        Label:
+            id: score_label
+
+            font_size: "70sp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.3}
+
+            
+        
+        Button:
+            text: "Back to Home"
+            font_size: '35sp'
+            size_hint: 0.4, 0.2
+            pos_hint: {'center_x': 0.5, 'center_y': 0.175}  # Same position as Button
+            size: (500, 250)
+            height: dp(40)
+            on_release: 
+                app.reset_game()  
+                app.root.current = "screen_one"
+
+
+                
