@@ -28,6 +28,8 @@ ScreenManager:
 <ScreenOne>:
     FloatLayout:
         orientation: 'vertical'
+        spacing: 20
+        padding: 20
 
         Image:
             source: 'roreee.jpg'
@@ -71,8 +73,16 @@ ScreenManager:
             pos_hint:{'center_x': 0.5, 'center_y': 0.175}
             on_press: root.change_button_color
             on_press: root.change_screen()
+            
 
-           
+        Image:
+            id: mute_image
+            source: "sound_on.png"
+            size_hint: None, None
+            size: 50, 50
+            pos_hint:{'center_x': 0.1, 'center_y': 0.1}
+          
+            
 
 
 <ScreenTwo>:
@@ -102,6 +112,16 @@ ScreenManager:
     FloatLayout:
         orientation: 'vertical'
 
+
+        Image:
+            source: 'bg_game.png'
+            allow_stretch: True
+            keep_ratio: True
+            size_hint: 3, 3
+            size: self.parent.size 
+            size: self.texture_size
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
         Label:
             id: score_label
             
@@ -111,13 +131,6 @@ ScreenManager:
             size: (100, 40)
             pos: 10, self.parent.height - 50
 
-        Image:
-            source: 'bg_game.png'
-            allow_stretch: True
-            keep_ratio: True
-            size_hint: 1, 1
-            size: self.texture_size
-            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         
         Label:
             text: "LIFE "
@@ -177,8 +190,7 @@ ScreenManager:
             size_hint: (0.3, 0.3)
             pos_hint: {'center_x': 0.3, 'center_y': 0.55}
             opacity: 0  # ซ่อนเอฟเฟกต์เริ่มต้น
-    
-     
+
     
 
         Button:

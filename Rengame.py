@@ -295,6 +295,7 @@ class PageoneApp(App) :
     def build(self):
         self.sound = SoundLoader.load("D:\ShootingGame\pixel-song.mp3") 
         if self.sound:
+            self.sound.loop = True  # ทำให้เสียงเล่นวน
             self.sound.play()  
 
         return Builder.load_file('pageone.kv')
