@@ -8,7 +8,7 @@ from kivy.uix.label import Label
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from kivy.resources import resource_add_path
 from random import randint
-from kivy.uix.screenmanager import Screen
+from kivy.core.audio import SoundLoader
 
 
 WINDOW_WIDTH = 564
@@ -284,8 +284,11 @@ class GameOverScreen(Screen):
 
 class PageoneApp(App) :
     def build(self):
-        return Builder.load_file('pageone.kv')
+        self.sound = SoundLoader.load("D:\ShootingGame\pixel-song.mp3") 
+        if self.sound:
+            self.sound.play()  
 
+        return Builder.load_file('pageone.kv')
     def reset_game(self):
         """รีเซ็ตเกมเมื่อกลับไปหน้าแรก"""
         screen_three = self.root.get_screen("screen_three")
@@ -294,7 +297,6 @@ class PageoneApp(App) :
         screen_three.reset_monster(screen_three.ids.monster_image_left)
         screen_three.reset_monster(screen_three.ids.monster_image_right)
 
-        
 
 if __name__ =='__main__':
     PageoneApp().run()
