@@ -10,14 +10,23 @@ from kivy.resources import resource_add_path
 from random import randint
 from kivy.core.audio import SoundLoader
 
+resource_add_path('D:\\New folder (2)\debug-font')
+LabelBase.register(DEFAULT_FONT, 'DebugF.otf')
 
 WINDOW_WIDTH = 564
 WINDOW_HEIGHT =317
 Window.size = (WINDOW_WIDTH, WINDOW_HEIGHT)
-Window.resizable = True 
+Window.resizable = False
+
 
 resource_add_path('D:\\New folder (2)\debug-font')
 LabelBase.register(DEFAULT_FONT, 'DebugF.otf')
+
+def enforce_fixed_size(window, width, height):
+    if width != WINDOW_WIDTH or height != WINDOW_HEIGHT:
+        Window.size = (WINDOW_WIDTH, WINDOW_HEIGHT)
+
+Window.bind(on_resize=enforce_fixed_size)
 
 class ScreenOne(Screen):
     def change_button_color(self):

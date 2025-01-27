@@ -110,6 +110,14 @@ ScreenManager:
             size_hint: (None, None)
             size: (100, 40)
             pos: 10, self.parent.height - 50
+
+        Image:
+            source: 'bg_game.png'
+            allow_stretch: True
+            keep_ratio: True
+            size_hint: 1, 1
+            size: self.texture_size
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         
         Label:
             text: "LIFE "
@@ -122,8 +130,8 @@ ScreenManager:
         Image:
             id: hero_image
             source: 'lauren.png' 
-            size_hint: (0.5, 0.5)
-            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+            size_hint: (0.2, 0.2)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.2}
         
         Image:
             id: hero_attack_image_right
@@ -170,7 +178,8 @@ ScreenManager:
             pos_hint: {'center_x': 0.3, 'center_y': 0.55}
             opacity: 0  # ซ่อนเอฟเฟกต์เริ่มต้น
     
-
+     
+    
 
         Button:
             text: 'Back to Home' #ย้อนกลับหน้าแรก
